@@ -60,6 +60,6 @@ class UserTest(BaseModel):
 
 
 class UserTestAnswers(BaseModel):
-    test = models.ForeignKey(UserTest, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    user_test = models.ForeignKey(UserTest, on_delete=models.CASCADE)
+    poll_question = models.ForeignKey(PollsQuestions, on_delete=models.CASCADE)
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
