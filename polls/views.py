@@ -18,9 +18,9 @@ class ListPolls(APIView):
 
     def get(self, request, format=None):
         """
-        Return a list of all users.
+        Return a list of all available polls.
         """
-        polls = mdl.Poll.objects.all()
+        polls = mdl.Poll.objects.filter(published=True)
         polls_ser = sers.PollSerializer(polls, many=True)
         return Response(polls_ser.data)
 

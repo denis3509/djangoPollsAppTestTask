@@ -12,8 +12,7 @@ User = get_user_model()
 def create_user_test(user: User, poll):
     user_test = mdl.UserTest.objects.create(poll=poll,
                                             user=user,
-                                            total_questions=poll.question_set.count()
-                                            )
+                                            total_questions=poll.question_set.count())
     return user_test
 
 
