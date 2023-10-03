@@ -46,17 +46,12 @@ def answer_question(user_test: mdl.UserTest, question: mdl.Question, user_choice
         user_test.save()
 
 
-# def get_current_question(user_test: mdl.UserTest):
-#     que = mdl.Question.objects.get(poll=user_test.poll,
-#                                    order=user_test.current_question)
-#     return que
 
 def get_current_question(user):
     incomplete_test = mdl.UserTest.objects \
         .filter(Q(started_at__isnull=True) | Q(finished_at__isnull=True), user=user).first()
     try:
         que = mdl.Question.objects.get(poll=incomplete_test.poll,
-
                                        order=incomplete_test.current_question)
         return que
     except mdl.Question.DoesNotExist:
@@ -70,23 +65,11 @@ def finish_test(user_test: mdl.UserTest):
                 percentage=user_test.correct_answers / user_test.total_questions
                 )
 
-
-# def calc_results(user_test: mdl.UserTest):
-#     answers = user_test.usertestanswers_set.objects.all()
-#     correct_count = 0
-#     for ans in answers:
-#         if ans.is_correct:
-#             correct_count += 1
-#     total = user_test.poll.question_set.all().count()
-#     user_test.total_questions = total
-#     user_test.correct_answers = correct_count
-#     user_test.save()
-
-
 def calc_results(user_test: mdl.UserTest):
     questions = user_test.poll.question_set.all().order_by("order")
     correct_count = 0
     for que in questions:
+        # TODO optimization
         user_answers = mdl.UserTestAnswers.objects.filter(user_test=user_test,
                                                           question=que)
         if set(user_answers) == set(que.correct_choices()):
