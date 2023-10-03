@@ -30,3 +30,9 @@ class PollSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True,
     )
+
+
+class UserTestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = mdl.UserTest
+        fields = ['id', 'poll__title', 'total_questions', 'correct_answers']

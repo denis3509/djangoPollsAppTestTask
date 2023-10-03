@@ -3,15 +3,27 @@ from typing import List
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
+
 from pollsApp import utils
 from . import models as mdl
 
 User = get_user_model()
 
 
+def get_incomplete_test(user):
+    incomplete_test = mdl.UserTest.objects \
+        .filter(Q(started_at__isnull=True) | Q(finished_at__isnull=True), user=user).first()
+    return incomplete_test
+
+
 def create_user_test(user: User, poll):
+    incomplete_test = get_incomplete_test(user)
+    if incomplete_test is not None:
+        raise ValidationError(f"user already started test {incomplete_test.poll.title}")
     user_test = mdl.UserTest.objects.create(poll=poll,
                                             user=user,
+                                            current_question=1,
                                             total_questions=poll.question_set.count())
     return user_test
 
@@ -34,10 +46,21 @@ def answer_question(user_test: mdl.UserTest, question: mdl.Question, user_choice
         user_test.save()
 
 
-def get_current_question(user_test: mdl.UserTest):
-    que = mdl.Question.objects.get(poll=user_test.poll,
-                                   order=user_test.current_question)
-    return que
+# def get_current_question(user_test: mdl.UserTest):
+#     que = mdl.Question.objects.get(poll=user_test.poll,
+#                                    order=user_test.current_question)
+#     return que
+
+def get_current_question(user):
+    incomplete_test = mdl.UserTest.objects \
+        .filter(Q(started_at__isnull=True) | Q(finished_at__isnull=True), user=user).first()
+    try:
+        que = mdl.Question.objects.get(poll=incomplete_test.poll,
+
+                                       order=incomplete_test.current_question)
+        return que
+    except mdl.Question.DoesNotExist:
+        return None
 
 
 def finish_test(user_test: mdl.UserTest):
@@ -80,5 +103,4 @@ def validate_poll(poll: mdl.Poll):
         que.is_valid()
         if not que.order == prev_order + 1:
             raise ValidationError(f"incorrect order values {que}")
-
         prev_order = prev_order + 1

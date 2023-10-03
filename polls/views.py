@@ -25,6 +25,21 @@ class ListPolls(APIView):
         return Response(polls_ser.data)
 
 
+class ListUserTest(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, format=None):
+        """
+        Return a list of all available polls.
+        """
+        tests = mdl.UserTest.objects.filter(started_at__isnull=False,
+                                            finished_at__isnull=False,
+                                            user=request.user)
+        polls_ser = sers.UserTestSerializer(tests, many=True)
+        return Response(polls_ser.data)
+
+
 class UserTest(APIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
