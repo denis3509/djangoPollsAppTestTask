@@ -112,6 +112,7 @@ class Choice(BaseModel):
 
 
 class UserTest(BaseModel):
+    """user's test data: poll, start_date, finish_date, results..."""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     current_question = models.IntegerField(default=0)
