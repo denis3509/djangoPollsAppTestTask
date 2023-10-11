@@ -8,8 +8,11 @@ from django.utils.translation import ngettext
 # Register your models here.
 
 
+
+
 class PollAdmin(admin.ModelAdmin):
     list_display = ["title", "published"]
+    actions = ["make_published"]
 
     def has_change_permission(self, request, obj=None):
 
@@ -35,9 +38,9 @@ class PollAdmin(admin.ModelAdmin):
             ngettext(
                 "%d poll was successfully marked as published.",
                 "%d polls were successfully marked as published.",
-                updated,
+                len(updated),
             )
-            % updated,
+            % len(updated),
             messages.SUCCESS,
         )
 
@@ -45,4 +48,4 @@ class PollAdmin(admin.ModelAdmin):
 admin.site.register(mdl.Question)
 admin.site.register(mdl.Choice)
 admin.site.register(mdl.Poll, PollAdmin)
-admin.site.register(mdl.UserTest)
+admin.site.register(mdl.TestResult)
