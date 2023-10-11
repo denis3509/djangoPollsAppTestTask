@@ -9,11 +9,39 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+def env(key, type_, default=None):
+    """reads env variables"""
+    if key not in os.environ:
+        if default is not None:
+            return default
+        else:
+            raise ValueError(f"Expected environment variable with key {key}")
+    val = os.environ[key]
+
+    if type_ == str:
+        return str(val)
+    elif type_ == bool:
+        if val.lower() in ["1", "true", "yes", "y", "ok", "on"]:
+            return True
+        if val.lower() in ["0", "false", "no", "n", "nok", "off"]:
+            return False
+        raise ValueError(
+            "Invalid environment variable '%s' (expected a boolean): '%s'" % (key, val)
+        )
+    elif type_ == int:
+        try:
+            return int(val)
+        except ValueError:
+            raise ValueError(
+                "Invalid environment variable '%s' (expected an integer): '%s'" % (key, val)
+            ) from None
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,15 +60,24 @@ CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "https://sub.example.com",
     "http://localhost:8080",
-    "http://127.0.0.1:9000",
-]
+    "http://127.0.0.1:9000"]
 
+# DRF
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
+}
 # Application definition
 
 INSTALLED_APPS = [
     'polls.apps.PollsConfig',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
