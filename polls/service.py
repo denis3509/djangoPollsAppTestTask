@@ -74,13 +74,13 @@ def answer_question(user, question: mdl.Question, user_choices: List[mdl.Choice]
         )
         answers.append(ans)
 
-    with transaction.atomic():
-        mdl.TestAnswers.objects.bulk_create(answers)
-        if test_result.current_question + 1 <= test_result.poll.question_set.count():
-            test_result.current_question += 1
-        else:
-            test_result.current_question = None
-        test_result.save()
+
+    mdl.TestAnswers.objects.bulk_create(answers)
+    if test_result.current_question + 1 <= test_result.poll.question_set.count():
+        test_result.current_question += 1
+    else:
+        test_result.current_question = None
+    test_result.save()
     return test_result
 
 

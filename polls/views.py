@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import render
 from django.http import HttpResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -75,6 +76,7 @@ class TestAnswer(APIView):
     authentication_classes = [jwt_auth.JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
+    @transaction.atomic
     def post(self, request, format=None):
         user_choices_ids = request.data["user_choices_ids"]
         question = mdl.Question.objects.get(id=request.data["question_id"])
